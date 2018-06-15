@@ -1,0 +1,4 @@
+.pyc
+.pyd
+myspider/.scrapy
+indexer/storage

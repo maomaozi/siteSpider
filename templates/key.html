@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>搜索结果：{{ key }}</title>
+     <link href="/css/style.css" type="text/css" rel="stylesheet"/>
+     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+     <script src="/js/key.js"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <button id="update" style="float: right">更新索引</button>
+        <div id="s-container">
+            <form action ='/search/'>
+            <input type="text" class="s_ipt" maxlength="100" name="key" value="{{key}}">
+            <input type="submit" value=" 搜索 " class="s_btn">
+            </form>
+
+            <HR align=center  color="#F0F0F0" SIZE=1 style="margin-bottom: 16px;">
+
+    {% for info in data %}
+            <div class="c-container result">
+                <a target="_blank" href="{{ info['url'] }}"><label style="font-size:18px;">{{info['title']}}</label></a><br />
+                {% if info['classLable']==1 %}
+                    <select name="choose" style="vertical-align: middle"><option value="1" selected="selected">正</option><option value="2">中</option><option value="0">负</option></select>
+                {% elif info['classLable']==2 %}
+                    <select name="choose" style="vertical-align: middle"><option value="2" selected="selected">中</option><option value="1">正</option><option value="0">负</option></select>
+                {% else %}
+                    <select name="choose" style="vertical-align: middle"><option value="0" selected="selected">负</option><option value="1">正</option><option value="2">中</option></select>
+                {% endif %}<img src="/images/yes.jpg" width="20px" height="20px" style="vertical-align: middle;display:none;"/><img src="/images/no.jpg" width="20px" height="20px" style="vertical-align: middle;display:none;"/>
+                <p style="font-size: 14px;color: #333;margin-top: 0px">{{info['preview']|safe}}</p>
+            </div>
+    {% endfor %}
+
+            <ul class="pagination">
+    {% for i in range(page_num) %}
+        <li><a href="/search?key={{ key }}&page={{i+1}}">{{i+1}}</a></li>
+    {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
