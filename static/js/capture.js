@@ -99,26 +99,36 @@ $(function () {
     });
 });
 
+var reff = "";
 $(document).on('click','.tt',function (){
+    var spider_name = $(this).html();
+    reffLog(spider_name);
+    clearInterval(reff);
+    reff = setInterval(function(){
+        reffLog(spider_name);
+    },2000);
+});
+
+function reffLog(spider_name) {
     $.ajax({
         url: "/capture/get_spider_log",
         data: {
-            "spider_name": $(this).html()
+            "spider_name": spider_name
         },
         success:function (data) {
             if(data.success){
-                $("#log").html(data.log)
+                $("#log").html(data.log);
             }else{
                 console.log(data)
             }
         }
     });
-});
+}
 
 function checkAll() {
     $("input[name=chx]").each(
         function(){
-            $(this).attr("checked",'true');
+            $(this).prop("checked",true);
         }
     )
 }
@@ -126,7 +136,7 @@ function checkAll() {
 function checkNo() {
     $("input[name=chx]").each(
         function(){
-            $(this).removeAttr("checked");
+            $(this).attr("checked",false);
         }
     )
 }
