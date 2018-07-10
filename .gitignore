@@ -1,4 +1,4 @@
-.pyc
-.pyd
+*.pyc
+*.pyd
 myspider/.scrapy
 indexer/storage

@@ -14,7 +14,7 @@ remove_illegle = re.compile(r'[^a-zA-Z0-9]', re.S)
 def create_spider_script(domain, spider_name, spider_allow_domain, spider_start_url, request_delay):
     if domain == 'localhost' or domain == '127.0.0.1':
 
-        if len(spider_name) >= 3 and spider_name != 'template':
+        if len(spider_name) >= 3 and ("a"<=spider_name[0]<="z" or "A"<=spider_name[0]<="Z" ) and spider_name != 'template':
             spider_name = remove_illegle.sub('', spider_name) + "Spider"
         else:
             return -1
@@ -62,8 +62,17 @@ def get_task_by_spidername(spider_name):
         domain = i[0]
         task_id = i[1]
     except:
-        return "", ""
-    return domain, task_id
+        return "", "", -1
+
+    if not len(task_id):
+        task_status = -1
+    elif task_id[0] == '-':
+        task_status = -1
+        task_id = task_id[1:]
+    else:
+        task_status = 0
+
+    return domain, task_id, task_status
 
 
 def get_all_spider_name():
@@ -122,8 +131,10 @@ def spider_stop(spider_name):
     # TODO: need handle SQL failed satuation
     if pid != '':
         if taskexec.rexec(domain, "kill -9 %s" % pid) >= 0:
+            # if command is executed success
+            domain, task_id, task_status = get_task_by_spidername(spider_name)
             c = conn.cursor()
-            r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("", spider_name))
+            r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("-" + task_id, spider_name))
             conn.commit()
             return 0
         else:
@@ -157,19 +168,21 @@ def spider_status(spider_name):
     if not len(spider_name):
         return '', ''
 
-    domain, task_id = get_task_by_spidername(spider_name)
+    domain, task_id, task_status = get_task_by_spidername(spider_name)
 
-    if len(domain) and not len(task_id):
+    if len(domain) and task_status != 0:
         return domain, ''
 
-    if not len(domain) and not len(task_id):
+    if not len(domain) and task_status != 0:
         return '', ''
 
     task_lst = taskexec.list_tasks(domain)
 
+    # check if task really exists
     if task_id not in task_lst:
+        domain, task_id, task_status = get_task_by_spidername(spider_name)
         c = conn.cursor()
-        r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("", spider_name))
+        r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("-" + task_id, spider_name))
         conn.commit()
         return '', ''
 
@@ -182,25 +195,25 @@ def spider_status(spider_name):
             return domain, pid1
         else:
             c = conn.cursor()
-            r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("", spider_name))
+            r = c.execute("UPDATE TASK set TASK_ID = '%s' WHERE SPIDER_NAME = '%s'" % ("-" + task_id, spider_name))
             conn.commit()
             return '', ''
     else:
         raise
 
 
-    def get_spider_log(spider_name):
+def get_spider_log(spider_name):
 
-        spider_name = remove_illegle.sub('', spider_name)
-        if not len(spider_name):
-            return -1
+    spider_name = remove_illegle.sub('', spider_name)
+    if not len(spider_name):
+        return -1
 
-        domain, task_id = get_task_by_spidername(spider_name)
+    domain, task_id, task_status = get_task_by_spidername(spider_name)
 
-        if task_id == '':
-            return -1
+    if task_id == '':
+        return -1
 
-        return taskexec.get_log_tail_by_taskid(domain, task_id)
+    return taskexec.get_log_tail_by_taskid(domain, task_id, 3200)
 
 
 if __name__ == "__main__":

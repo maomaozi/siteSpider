@@ -1,5 +1,9 @@
 $(function () {
     loadList();
+    var ref = "";
+    ref = setInterval(function(){
+        refList();
+    },5000);
 
     $("#add").click(function () {
         if(!($("#domain").val() && $("#allow_domain").val() && $("#request_delay").val() && $("#start_url").val() && $("#name").val())){
@@ -62,9 +66,9 @@ $(function () {
                     },
                     success:function (data) {
                         if(data.success){
-                            console.log(data)
+                            alert("开始运行");
                         }else{
-                            console.log(data)
+                            alert("错误！")
                         }
                     }
                 });
@@ -83,9 +87,9 @@ $(function () {
                     },
                     success:function (data) {
                         if(data.success){
-                            console.log(data)
+                            alert("停止运行");
                         }else{
-                            console.log(data)
+                            alert("错误！")
                         }
                     }
                 });
@@ -93,15 +97,22 @@ $(function () {
         );
         loadList();
     });
+});
 
-    $("[id^='tipLog_']").each(function() {
-        $(this).click(function() {
-            alert("1");
-        })
+$(document).on('click','.tt',function (){
+    $.ajax({
+        url: "/capture/get_spider_log",
+        data: {
+            "spider_name": $(this).html()
+        },
+        success:function (data) {
+            if(data.success){
+                $("#log").html(data.log)
+            }else{
+                console.log(data)
+            }
+        }
     });
-    // $("#tipLog"+).click(function(){
-    //     alert($(this).html());
-    // });
 });
 
 function checkAll() {
@@ -118,25 +129,6 @@ function checkNo() {
             $(this).removeAttr("checked");
         }
     )
-}
-
-
-function showLog() {
-    $(this).html()
-    // $.ajax({
-    //     url: "/capture/get_spider_log",
-    //     data: {
-    //         "spider_name": $(this).html()
-    //     },
-    //     success:function (data) {
-    //         if(data.success){
-    //             alert(data);
-    //             console.log(data)
-    //         }else{
-    //             console.log(data)
-    //         }
-    //     }
-    // });
 }
 
 function loadList() {
@@ -161,7 +153,7 @@ function loadList() {
                 tableBodyHtml.push("</td>");
 
                 //spider_name
-                tableBodyHtml.push("<td id='tipLog_" + i +"' style='padding-left: 20px;padding-right: 20px;width: 220px;color: #3975ea;cursor: pointer;'>");
+                tableBodyHtml.push("<td class='tt'  style='padding-left: 20px;padding-right: 20px;width: 220px;color: #3975ea;cursor: pointer;'>");
                 tableBodyHtml.push( data[i].spider_name );
                 tableBodyHtml.push("</td>");
 
@@ -174,11 +166,63 @@ function loadList() {
                 //check-box
                 tableBodyHtml.push("<td style=\"\">");
                 // tableBodyHtml.push("<td style=\"display:inline\">");
-                tableBodyHtml.push("<input type='checkbox' name='chx'>");
+                tableBodyHtml.push("<input type='checkbox' id='check_"+i+"' name='chx'>");
                 tableBodyHtml.push("</td>");
                 tableBodyHtml.push(" </tr>");
             }
             $("#spiderList").html(tableBodyHtml.join(""));
+        }
+    });
+}
+
+function refList() {
+    var checked=$('input[name=chx]:checked');
+    var yy = [];
+    checked.each(function (i) {
+        yy[i] = $(this).attr("id");
+    });
+    $.ajax({
+        url: "/capture/list_spiders",
+        success:function (data) {
+            var tableBodyHtml = new Array();
+            for(var i=0;i<data.length;i++){
+                // var imgUrl;
+                var char;
+                if(data[i].status){                             //spider is running
+                    // imgUrl = "../images/running.gif";
+                    char = "running"
+                }else{                                          //spider is not running
+                    // imgUrl ="../images/running.gif";
+                    char = "waiting"
+                }
+                tableBodyHtml.push("<tr style='height: 30px'>");
+                //domain
+                tableBodyHtml.push("<td style=\"padding-left: 20px;padding-right: 20px;width: 230px;\">");
+                tableBodyHtml.push("<label>" + data[i].domain + "</label>");
+                tableBodyHtml.push("</td>");
+
+                //spider_name
+                tableBodyHtml.push("<td class='tt'  style='padding-left: 20px;padding-right: 20px;width: 220px;color: #3975ea;cursor: pointer;'>");
+                tableBodyHtml.push( data[i].spider_name );
+                tableBodyHtml.push("</td>");
+
+                //status
+                tableBodyHtml.push("<td style='padding-left: 20px;padding-right: 20px;width: 150px;'>");
+                // tableBodyHtml.push("<label>" + char + "</label><img width='25px' height='25px' src=\""+imgUrl+"\">");
+                tableBodyHtml.push("<label>" + char + "</label>");
+                tableBodyHtml.push("</td>");
+
+                //check-box
+                tableBodyHtml.push("<td style=\"\">");
+                // tableBodyHtml.push("<td style=\"display:inline\">");
+                tableBodyHtml.push("<input type='checkbox' id='check_"+i+"' name='chx'>");
+                tableBodyHtml.push("</td>");
+                tableBodyHtml.push(" </tr>");
+            }
+            $("#spiderList").html(tableBodyHtml.join(""));
+            for(var j=0;j<yy.length;j++){
+                $("input[id="+yy[j]+"]").attr("checked","true");
+            }
         }
     });
 }

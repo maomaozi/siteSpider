@@ -3,19 +3,16 @@ $(function () {
             $.ajax({
                 url:"/update/progress",
                 success:function (data) {
-                    var pro = parseInt(data.progress*10000)/100;  //舍去两位小数后面的小数
-                    $('#pro').text(pro+"%");
-                    $('#proBack').css("width",pro+"%");
-                    if(data.progress){
+                    if(data.status){
                         $("#start").attr("disabled", true);
                         ref = setInterval(function(){
                             update();
                         },1000);
                     }else {
-                        // $("#stop").attr("disabled", true);
+                        $("#stop").attr("disabled", true);
                     }
                 }
-            })
+            });
             function update() {    //更新进度条
                 $.ajax({
                     url:"/update/progress",
@@ -57,4 +54,4 @@ $(function () {
                     }
                 });
             });
-})
+});

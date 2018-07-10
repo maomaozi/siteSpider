@@ -48,8 +48,8 @@ def stop_update():
 @app.route('/update/progress')
 def get_progress():
     search_engine = searcher2.get_instance()
-    val = search_engine.get_update_progress()
-    return jsonify(progress=val)
+    is_running, val = search_engine.get_update_progress()
+    return jsonify(status=is_running, progress=val)
 
 
 @app.route('/search/')
@@ -137,9 +137,10 @@ def get_spider_log():
     log = smgr.get_spider_log(request.values.get("spider_name", 0))
     if log == -1:
         # TODO: show some error imformation
-        return jsonify(success=0)
+        return jsonify(success=1, log="No log for %s" % request.values.get("spider_name", 0))
     else:
         # TODO: show log
+        log = log.replace('\n', '</br>')
         return jsonify(success=1, log=log)
 
 

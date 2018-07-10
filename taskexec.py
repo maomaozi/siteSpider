@@ -76,7 +76,7 @@ def get_task_info(task_id, domain):
         raise
 
 
-def get_log_tail_by_taskid(domain, task_id):
+def get_log_tail_by_taskid(domain, task_id, size=1000):
     logfile_fullpath = os.path.join(cfg.TMP_DIR, task_id + '.log')
 
     if domain == 'localhost' or domain == '127.0.0.1':
@@ -86,7 +86,7 @@ def get_log_tail_by_taskid(domain, task_id):
 
         filesize = os.path.getsize(logfile_fullpath)
         with open(logfile_fullpath, 'rb') as f_log:
-            f_log.seek(-1000 if filesize > 1000 else (-filesize), 2)
+            f_log.seek(-size if filesize > size else (-filesize), 2)
             res = f_log.read()
         return res
     else:

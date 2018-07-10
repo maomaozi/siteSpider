@@ -212,7 +212,7 @@ class Searcher():
         self.update_lock.release()
 
     def get_update_progress(self):
-        return self.update_progress
+        return self.is_update_in_progress, self.update_progress
 
     def create_query(self, kws):
 
