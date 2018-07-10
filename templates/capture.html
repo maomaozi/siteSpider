@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<div id="web" style="float: left;width: 45%;height: 700px;margin:20px 3% 20px 5%;border: 1px solid #000">
+<div id="web" style="float: left;width: 40%;height: 700px;margin:20px 3% 20px 5%;border: 1px solid #000">
     <table>
         <thead>
         <tr>
@@ -26,9 +26,11 @@
         </table>
     </div>
 </div>
-<div id="log" style="float: right;width: 38%;height: 700px;margin:20px 5% 20px 3%;border: 1px solid #000">
-    log
-</div><br />
+<div id="log" style="float: right;width: 40%;height: 680px;margin:20px 5% 20px 3%;border: 1px solid #000;padding:10px; overflow-y:scroll">
+    Select spider to show log
+</div>
+
+<br />
 <div style="float: left;margin: 0 5%;">
     <div style="height: 30px;margin: 0 10px;display: inline-block">
         <select id="domain" style="width: 80px;"><option value="localhost">localhost</option></select><input id="name" placeholder="Name" style="width: 100px;"/><input id="allow_domain" placeholder="抓取域" style="width: 100px;"/><input id="start_url" placeholder="抓取起始URL" style="width: 200px;"/><input id="request_delay" placeholder="抓取间隔" style="width: 55px;"/>

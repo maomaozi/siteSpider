@@ -213,7 +213,7 @@ def get_spider_log(spider_name):
     if task_id == '':
         return -1
 
-    return taskexec.get_log_tail_by_taskid(domain, task_id, 3200)
+    return taskexec.get_log_tail_by_taskid(domain, task_id, 20000)
 
 
 if __name__ == "__main__":
