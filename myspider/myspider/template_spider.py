@@ -1,5 +1,10 @@
 import scrapy
 import hashlib
+from ctypes import *
+import random
+
+obj_lib = CDLL("./c_set.so")
+obj_lib.init()
 
 class %s(scrapy.spiders.Spider):
     name = "%s"
@@ -16,6 +21,10 @@ class %s(scrapy.spiders.Spider):
         current_page_urls = sel.select('//a/@href').extract()
 
         for url in current_page_urls:
+
+            if random.randint(0, 1000) == 5:
+                print "Now hash table length = " + str(obj_lib.length())
+
             if url.startswith('http://'):
                 pass
             elif url.startswith('/') or url.startswith('.'):
@@ -28,6 +37,8 @@ class %s(scrapy.spiders.Spider):
                 md5_obj.update(url.encode('utf-8'))
                 md5_url = md5_obj.hexdigest()
 
-                if md5_url not in %s.url_set:
-                    %s.url_set.add(md5_url)
+                #if md5_url not in %s.url_set:
+                    #%s.url_set.add(md5_url)
+                if obj_lib.find(c_char_p(md5_url)) == 0:
+                    obj_lib.insert(c_char_p(md5_url))
                     yield scrapy.Request(url, callback=self.parse)
